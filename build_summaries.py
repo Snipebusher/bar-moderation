@@ -56,6 +56,8 @@ def loadLobbies():
     entries.sort(key=lambda t: t[0])
   return lobbies
 
+if not os.path.exists(os.path.join(os.path.dirname(__file__), "lobbies")):
+  os.makedirs(os.path.join(os.path.dirname(__file__), "lobbies"))
 LOBBIES = loadLobbies()
 
 def parseScript(script: str):
@@ -234,6 +236,8 @@ class Player(NamedTuple):
   rgbcolor: tuple[float, float, float] = None
 
 LogLine = Union[
+  tuple[float, int, int, Literal["JOINED"]],
+  tuple[float, int, int, Literal["LEFT"], str],
   tuple[float, int, int, Literal["MSG"], str],
   tuple[float, int, int, Literal["PING"], str],
   tuple[float, int, int, Literal["PING"], tuple[Literal["PING"], list[float]]],
@@ -249,6 +253,10 @@ class Replay(NamedTuple):
   startTime: float
   logLines: list[LogLine]
   lobbyName: tuple[str | None, str | None]
+
+def decode(b: bytes):
+  try: return b.decode()
+  except: return b.decode("iso-8859-1")
 
 def processReplay(filename: str):
   header, rawScript, setupScript, chunks = readReplay(filename)
@@ -268,8 +276,8 @@ def processReplay(filename: str):
       id=player["accountid"],
       name=str(player["name"]),
       spectator=player["spectator"],
-      rank=player["rank"],
-      skill=player["skill"],
+      rank=player.get("rank"),
+      skill=player.get("skill"),
       skilluncertainty=player.get("skilluncertainty"),
       **(teams[player["team"]] if "team" in player else {}),
     ) for i, player in enumerate(game['player'])
@@ -284,21 +292,31 @@ def processReplay(filename: str):
     if action == 4: startTime = gameTime
     # new spectator joined event
     if action == 75:
-      index = int(data[3])
+      player = int(data[3])
       spectator = int(data[4])
       team = int(data[5])
-      name = data[6:].decode()
-      if index not in players:
-        players[index] = Player(
-          index=index,
+      name = decode(data[6:])
+      if player not in players:
+        players[player] = Player(
+          index=player,
           name=str(name),
           spectator=spectator,
         )
+      logLines.append((gameTime, player, None, "JOINED", "Player joined"))
+    # player left
+    if action == 39:
+      player = int(data[1])
+      reason = {
+        0: "Connection error",
+        1: "Resigned" if not players[player].spectator else "Left",
+        2: "Kicked",
+      }.get(int(data[2]), "Unknown reason")
+      logLines.append((gameTime, player, None, "LEFT", "Player left:" + reason))
     # chat message
     if action == 7:
       msgFrom = int(data[2])
       msgTo = int(data[3])
-      msgStr = data[4:-1].decode()
+      msgStr = decode(data[4:-1])
       logLines.append((gameTime, msgFrom, msgTo, "MSG", msgStr))
       playerCache.pop(msgFrom, None)
     # map draw
@@ -307,8 +325,7 @@ def processReplay(filename: str):
       drawType = int(data[3])
       # map ping
       if drawType == 0:
-        try: msgStr = data[9:-1].decode()
-        except: msgStr = data[9:-1].decode("iso-8859-1")
+        msgStr = decode(data[9:-1])
         cache = playerCache.pop(drawFrom, None)
         if msgStr:
           logLines.append((gameTime, drawFrom, None, "PING", msgStr))
@@ -668,8 +685,6 @@ def buildAll():
   with open(indexname, "w+") as f:
     f.write(buildIndexPage(replays))
 
-if not os.path.exists(os.path.join(os.path.dirname(__file__), "lobbies")):
-    os.makedirs(os.path.join(os.path.dirname(__file__), "lobbies"))
 if not os.path.exists(os.path.join(os.path.dirname(__file__), "replays")):
     os.makedirs(os.path.join(os.path.dirname(__file__), "replays"))
 if not os.path.exists(os.path.join(os.path.dirname(__file__), "build")):
