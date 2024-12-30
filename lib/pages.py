@@ -15,7 +15,7 @@ def buildPath(filename: str):
   <a href="/view/%s">%s</a>
 """ % (
       str(item).strip("/"),
-      item.name.removesuffix("/") + ("/" if index else "")
+      item.name + ("/" if index else "") if item.name else str(item)
     ) for (index, item) in reversed(list(enumerate(pathItems))))
 
 def buildPage(filename: str, content: str, *, style="", script=""):

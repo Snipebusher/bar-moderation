@@ -13,9 +13,13 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
   def do_GET(self):
     self.handle_one_request
     url = urllib.parse.urlparse(self.path)
-    path: str = url.path.strip("/") + "/"
+    path = url.path.strip("/") + "/"
     if path.startswith("view/"):
-      filepath = pathlib.Path(urllib.parse.unquote(path).removeprefix("view").removesuffix("/") or "/").absolute()
+      filepath = pathlib.Path(urllib.parse.unquote(path).removeprefix("view").strip("/"))
+      if not filepath.drive:
+        filepath = pathlib.Path("/" + str(filepath)).absolute()
+      elif not filepath.is_absolute():
+        filepath = pathlib.Path(filepath.drive + "/")
       if filepath.is_dir():
         self.send_response(200, "OK")
         self.send_header('Content', 'text/html; charset=UTF-8')
