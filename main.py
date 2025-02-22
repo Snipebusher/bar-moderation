@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+import webbrowser
+webbrowser.register('opera', None, webbrowser.BackgroundBrowser("S:\Apps\Opera GX\Opera GX\opera.exe"))
+webbrowser.get('opera').open("http://localhost:8888")
 
 import pathlib
 import argparse
