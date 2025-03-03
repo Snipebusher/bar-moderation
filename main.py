@@ -45,8 +45,8 @@ if __name__ == "__main__":
   if selected_file:
     server.defaultPath = selected_file
   
-  # webbrowser.register('opera', None, webbrowser.BackgroundBrowser("S:\\Apps\\Opera GX\\Opera GX\\opera.exe"))
-  # webbrowser.get('opera').open("http://localhost:8888")
+  # webbrowser.register('browser', None, webbrowser.BackgroundBrowser("S:\\Apps\\Opera GX\\Opera GX\\opera.exe"))
+  # webbrowser.get('browser').open("http://localhost:8888")
   webbrowser.open("http://localhost:8888")
 
   httpd = http.server.HTTPServer(server_address, server.RequestHandler)
