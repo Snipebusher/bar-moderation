@@ -1,40 +1,22 @@
 import pathlib
-import subprocess
+import urllib.parse
 
 def buildPath(filename: str):
-    pathItems = [pathlib.Path(filename)]
-    while True:
-        last = pathItems[-1]
-        if last.parent == last:
-            break
-        pathItems.append(last.parent)
-    links = "\n".join(
-        "<a href='/view/{0}'>{1}</a>".format(
-            str(item).strip("/"),
-            item.name + ("/" if index == 0 and item.name else "") if item.name else str(item)
-        )
-        for index, item in reversed(list(enumerate(pathItems)))
-    )
-    return """<div id="path">
-  <button onclick="triggerNewInstance()">GOTO</button>
-%s
-</div>
-<script>
-function triggerNewInstance(){
-  fetch('/new_instance')
-    .then(response => response.text())
-    .then(data => {
-      alert(data);
-    })
-    .catch(err => {
-      alert('Error: ' + err);
-    });
-}
-</script>
-""" % links
+  pathItems = [pathlib.Path(filename)]
+  while True:
+    last = pathItems[-1]
+    if last.parent == last: break
+    pathItems.append(last.parent)
 
-def handle_new_instance():
-    subprocess.Popen(["python", "main.py"])
+  return """<div id="path">
+  <button onclick="openSelectPath()">GOTO</button>
+%s
+</div>""" % "\n".join("""
+  <a href="/view/%s">%s</a>
+""" % (
+      str(item).strip("/"),
+      item.name + ("/" if index else "") if item.name else str(item)
+    ) for (index, item) in reversed(list(enumerate(pathItems))))
 
 def buildPage(filename: str, content: str, *, style="", script=""):
     return """
@@ -161,10 +143,10 @@ body {
 }
 
 .collapsable {
-  background-color: var(--collapsible-bg) !important;
-  color: var(--text-color);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 10px;
+  background-color: #121212 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 10px !important;
 }
 
 .collapsed .collapsable {
@@ -244,6 +226,20 @@ input[type="checkbox"], input[type="radio"] {
 
 [data-theme="light"] input[type="checkbox"], [data-theme="light"] input[type="radio"] {
   filter: invert(0);
+}
+
+/* Override the white background on .collapser inside .filters.collapsed */
+#log-table .filters.collapsed .collapser {
+  background-color: var(--background-color) !important;
+  color: var(--text-color) !important;
+}
+
+#log-table .filters {
+    background-color: transparent !important;
+}
+
+#log-table h3 {
+  margin-bottom: 0 !important;
 }
 """
 
