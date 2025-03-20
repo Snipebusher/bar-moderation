@@ -17,7 +17,7 @@ from typing import NamedTuple, Union, Literal
 from collections import defaultdict
 from .replays import Header, Replay, readReplay
 from .teamcolors import setupTeamColors
-from .pages import buildPage
+from .pages import buildPage, THEME
 
 REPLAY_PAGE = "https://www.beyondallreason.info/replays?gameId=%s"
 MATCH_PAGE = "https://server4.beyondallreason.info/battle/%s"
@@ -413,6 +413,15 @@ STYLE = """
   flex: 1 1;
 }
 
+h1 {
+  margin-left: 10;
+}
+
+h3 {
+  margin-left: 10;
+  cursor: pointer;
+}
+
 #log-table {
   --player-color: lightGrey;
   --border-width: 4px;
@@ -421,7 +430,7 @@ STYLE = """
 }
 
 #log-table h3 {
-  margin-bottom: -20px;
+  cursor: default;
 }
 
 #log-table .filters {
@@ -429,12 +438,16 @@ STYLE = """
   top: 0;
   z-index: 100;
   background-color: white;
+  border-radius: 5px;
 }
 
 #log-table .filters .collapser {
   float: right;
   margin: 0;
   padding: 5px;
+  background-color: var(--collapser-bg) !important;
+  color: var(--text-color);
+  cursor: pointer;
 }
 
 #log-table .filters.collapsed .collapser {
@@ -465,11 +478,12 @@ STYLE = """
 
 #log-table .filters .filter-players {
   display: inline-block;
+  margin-left: 15px;
 }
 
 #log-table .filters .filter-player {
   display: inline-block;
-  background-color: white;
+  background-color: var(--filter-player-bg);
   border-color: var(--player-color);
   border-width: 2px;
   border-left-width: 12px;
