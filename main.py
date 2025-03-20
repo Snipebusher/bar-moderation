@@ -1,13 +1,24 @@
 #!/usr/bin/env python3
 
+import webbrowser
 import pathlib
 import argparse
 import http.server
-import webbrowser
 import threading
 import time
 import signal
 from lib import server
+import tkinter as tk
+from tkinter import filedialog
+import os
+import subprocess
+
+def run_file_dialog():
+    root = tk.Tk()
+    root.withdraw()
+    file_path = filedialog.askopenfilename(filetypes=[("SDFZ files", "*.sdfz")])
+    root.destroy()
+    return file_path
 
 parser = argparse.ArgumentParser(
   prog="BARreplays",
@@ -31,13 +42,21 @@ if __name__ == "__main__":
   server_address = (args.bind, args.port)
   if args.DIR:
     server.defaultPath = str(pathlib.Path(args.DIR).absolute())
+  
+  selected_file = run_file_dialog()
+  if selected_file:
+    server.defaultPath = selected_file
+  
+  # webbrowser.register('browser', None, webbrowser.BackgroundBrowser("S:\\Apps\\Opera GX\\Opera GX\\opera.exe"))
+  # webbrowser.get('browser').open("http://localhost:8888")
+  webbrowser.open("http://localhost:8888")
+
   httpd = http.server.HTTPServer(server_address, server.RequestHandler)
   thread = threading.Thread(target=httpd.serve_forever, daemon=True)
   thread.start()
-  time.sleep(0.5)
   if thread.is_alive():
     print("listening to", "http://%s:%s/" % server_address)
     if args.open:
-      webbrowser.open_new_tab("http://%s:%s/")
+      webbrowser.open_new_tab("http://%s:%s/" % server_address)
     signal.signal(signal.SIGINT, lambda sig, frame: httpd.shutdown())
   thread.join()
