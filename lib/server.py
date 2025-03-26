@@ -12,6 +12,7 @@ defaultPath = str(pathlib.Path(os.getcwd()).absolute())
 class RequestHandler(http.server.BaseHTTPRequestHandler):
   def do_GET(self):
     self.handle_one_request
+    self.path = self.path.replace("%22", "") # Credit to fritman1
     url = urllib.parse.urlparse(self.path)
     path = url.path.strip("/") + "/"
     if path.startswith("view/"):
