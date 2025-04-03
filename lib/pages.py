@@ -100,6 +100,7 @@ THEME = """
   --link-hover: #0056b3;
   --collapsible-bg: white;
   --filter-player-bg: white;
+  --draw-color: black;
 }
 
 [data-theme="dark"] {
@@ -111,6 +112,7 @@ THEME = """
   --link-hover: #63b8ff;
   --collapsible-bg: #0f0f0f;
   --filter-player-bg: black;
+  --draw-color: white;
 }
 
 body {
