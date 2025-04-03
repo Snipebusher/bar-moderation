@@ -517,7 +517,7 @@ h3 {
 
 #log-table svg path {
   fill: none;
-  stroke: black;
+  stroke: var(--draw-color);
 }
 
 #log-table tr.player-255 {
