@@ -38,6 +38,7 @@ LogLine = Union[
   tuple[float, int, int, Literal["JOINED"]],
   tuple[float, int, int, Literal["LEFT"], str],
   tuple[float, int, int, Literal["MSG"], str],
+  tuple[float, int, int, Literal["PAUSE"], str],
   tuple[float, int, int, Literal["PING"], str],
   tuple[float, int, int, Literal["PING"], tuple[Literal["PING"], list[float]]],
   tuple[float, int, int, Literal["DRAW"], tuple[Literal["DRAW"], list[tuple[float, int, int, int, int]]]],
@@ -116,6 +117,15 @@ def processReplay(replay: Replay):
       msgStr = decode(data[4:-1])
       logLines.append((gameTime, msgFrom, msgTo, "MSG", msgStr))
       playerCache.pop(msgFrom, None)
+    # game pause/unpause
+    if action == 13:
+      player_index = int(data[1])
+      mode = int(data[2])
+      player_name = players[player_index].name if player_index in players else "Unknown Player"
+      if mode == 1:
+        logLines.append((gameTime, 255, None, "PAUSE", player_name + " paused the game"))
+      else:
+        logLines.append((gameTime, 255, None, "PAUSE", player_name + " unpaused the game"))
     # map draw
     if action == 31:
       drawFrom = int(data[2])
@@ -457,6 +467,10 @@ h3 {
 #log-table .filters .collapsable {
   border: 2px solid lightGrey;
   border-radius: 10px;
+}
+
+label {
+  cursor: pointer
 }
 
 #log-table .filters input[type=checkbox] {
