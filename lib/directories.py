@@ -17,7 +17,7 @@ from typing import NamedTuple, Union, Literal
 from .replays import Header
 from .teamcolors import setupTeamColors
 from .replays import Replay, readReplay
-from .pages import buildPage
+from .pages import buildPage, THEME
 
 def buildDirectoryPage(dir: str):
   dirobj = pathlib.Path(dir)
