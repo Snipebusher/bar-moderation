@@ -205,13 +205,16 @@ def buildReplayPage(filename: str):
     #   lobbyName = lobbyNameBefore
     # else:
     #   lobbyName = "%s ~~~ %s" % (lobbyNameBefore, lobbyNameAfter)
+    dt = summary.header.unixTime.isoformat(" ")
+    date_part, time_part = dt.split(" ")
     return """
-<h1>%s - %s (<a href="%s">replay</a> / <a href="%s">match</a>)</h1>
-""" % (
-  summary.header.unixTime.isoformat(" "),
-  html.escape(str(summary.game["mapname"])),
-  REPLAY_PAGE % (summary.header.gameID),
-  MATCH_PAGE % (summary.game["server_match_id"]) if summary.game.get("server_match_id") else "",
+    <h1>%s - %s - %s - <a href="%s">Replay</a> / <a href="%s">Match</a></h1>
+    """ % (
+    date_part,
+    time_part,
+    html.escape(str(summary.game["mapname"])),
+    REPLAY_PAGE % (summary.header.gameID),
+    MATCH_PAGE % (summary.game["server_match_id"]) if summary.game.get("server_match_id") else "",
 )
 
   def htmlHeaders():
@@ -455,13 +458,14 @@ h3 {
   float: right;
   margin: 0;
   padding: 5px;
-  background-color: var(--collapser-bg) !important;
   color: var(--text-color);
   cursor: pointer;
 }
 
 #log-table .filters.collapsed .collapser {
-  background-color: white;
+  background-color: var(--background-color) !important;
+  border: none;
+  border-radius: 5px;
 }
 
 #log-table .filters .collapsable {
