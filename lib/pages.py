@@ -96,8 +96,8 @@ THEME = """
   --text-color: black;
   --button-background: #007bff;
   --button-hover: #0056b3;
-  --link-color: #007bff;
-  --link-hover: #0056b3;
+  --link-color: #1abc9c;
+  --link-hover: #16a085;
   --collapsible-bg: white;
   --filter-player-bg: white;
   --draw-color: black;
@@ -108,8 +108,8 @@ THEME = """
   --text-color: white;
   --button-background: #007bff;
   --button-hover: #0056b3;
-  --link-color: #1e90ff;
-  --link-hover: #63b8ff;
+  --link-color: #1abc9c;
+  --link-hover: #48c9b0;
   --collapsible-bg: #0f0f0f;
   --filter-player-bg: black;
   --draw-color: white;
@@ -169,20 +169,27 @@ button:hover {
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 #path a {
-  color: var(--link-color);
+  color: white;
   text-decoration: none;
-  margin-right: 10px;
+  margin-left: 20px;
+  margin-right: -20px;
 }
 #path a:hover {
   text-decoration: underline;
-  color: var(--link-hover);
+  background-color: var(--link-hover);
 }
 a {
-  color: var(--link-color);
+  background-color: var(--link-color);
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  display: inline-block;
 }
 a:hover {
-  text-decoration: underline;
-  color: var(--link-hover);
+  text-decoration: none;
+  background-color: var(--link-hover);
 }
 input, select, textarea {
   background-color: var(--background-color);
