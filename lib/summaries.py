@@ -379,7 +379,7 @@ def buildReplayPage(filename: str):
 <div id="log-table">
   <h3>Logs</h3>
   <div class="filters">
-    <h3 class="collapser">Filters [+]</h3>
+    <h3 class="collapser">Filters [-]</h3>
     <div class="collapsable">
 %s
     </div>
