@@ -9,7 +9,7 @@ def buildPath(filename: str):
       break
     pathItems.append(last.parent)
   return """<div id="path">
-  <button onclick="openSelectPath()">GOTO</button>
+  <button onclick="openSelectPath()">Choose File</button>
 %s
 </div>""" % "\n".join("""
   <a href="/view/%s">%s</a>
