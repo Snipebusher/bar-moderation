@@ -133,7 +133,21 @@ def processReplay(replay: Replay):
       drawType = int(data[3])
       # map ping
       if drawType == 0:
-        msgStr = decode(data[9:-1])
+        msgStr = None
+        if (len(data)) < 14:
+          msgStr = decode(data[9:-1])
+        else:
+          msgStrNew = decode(data[13:-1])
+          msgStrOld = decode(data[9:-1])
+          isOldBad = any(ord(char) < 32 or ord(char) == 127 for char in msgStrOld)
+          isNewBad = any(ord(char) < 32 or ord(char) == 127 for char in msgStrNew)
+          if isNewBad: #selecting old replay decoding (but most likely will result into using newer and cutting first part of message)
+            msgStr = msgStrOld
+          elif isOldBad or not isNewBad : #selecting new replay decoding (as of june 2025)
+            msgStr = msgStrNew
+          else:
+            msgStr = msgStrNew
+            print("WARNING : encoding as yet again change, plesae fix") #future
         cache = playerCache.pop(drawFrom, None)
         if msgStr:
           logLines.append((gameTime, drawFrom, 252, "PING", msgStr))
