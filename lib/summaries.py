@@ -13,6 +13,7 @@ import gzip
 import json
 import os
 import html
+import math
 from typing import NamedTuple, Union, Literal
 from collections import defaultdict
 from .replays import Header, Replay, readReplay
@@ -145,16 +146,24 @@ def processReplay(replay: Replay):
           playerCache[drawFrom] = cache
       # map draw
       elif drawType == 2:
-        x1: int = struct.unpack("<h", data[4:6])[0]
-        z1: int = struct.unpack("<h", data[6:8])[0]
-        x2: int = struct.unpack("<h", data[8:10])[0]
-        z2: int = struct.unpack("<h", data[10:12])[0]
+        if len(data) < 21:
+          #OLD REPLAY
+          x1: int = struct.unpack("<h", data[4:6])[0]
+          z1: int = struct.unpack("<h", data[6:8])[0]
+          x2: int = struct.unpack("<h", data[8:10])[0]
+          z2: int = struct.unpack("<h", data[10:12])[0]
+        else:
+          #NEW REPLAY FORMAT (as of june 2025)
+          x1: int = struct.unpack("<h", data[4:6])[0]
+          z1: int = struct.unpack("<h", data[8:10])[0]
+          x2: int = struct.unpack("<h", data[12:14])[0]
+          z2: int = struct.unpack("<h", data[16:18])[0]
         cache = playerCache.pop(drawFrom, None)
         if cache and cache[0] == "DRAW" and cache[1][-1][0] > gameTime - 5:
-          cache[1].append((gameTime, x1, z1, x2, z2))
+          cache[1].append((gameTime, x1, z1, x2, z2)) #if there is a draw previously (within 5 TS), we add to cache
         else:
-          cache = ("DRAW", [(gameTime, x1, z1, x2, z2)])
-          logLines.append((gameTime, drawFrom, 252, "DRAW", cache))
+          cache = ("DRAW", [(gameTime, x1, z1, x2, z2)]) #if there isn't we summarize the draw into a logLine
+          logLines.append((gameTime, drawFrom, 252, "DRAW", cache)) 
         playerCache[drawFrom] = cache
   
   # lobbyEntries = LOBBIES.get(game["autohostname"], [])
@@ -263,8 +272,9 @@ def buildReplayPage(filename: str):
       lastFrom = playerFrom
       playerFromName = playerName(playerFrom)
       playerToName = playerName(playerTo)
+
       if isinstance(msgStr, tuple):
-        if msgStr[0] == "PING":
+        if msgStr[0] == "PING": #useless check
           msgStr = """<span style="font-size: %d%%">%d times</span>""" % (100 + 5 * (len(msgStr[1]) - 1), len(msgStr[1]))
         elif msgStr[0] == "DRAW":
           _, minx, minz, maxx, maxz = msgStr[1][0]
@@ -278,7 +288,7 @@ def buildReplayPage(filename: str):
           medz = (maxz + minz) / 2
           medsize = max(maxx - minx, maxz - minz) / 2 + 10
           svgSize = 100
-          strokSize = medsize / svgSize
+          strokSize = math.ceil(medsize / svgSize) #never set stroke to something that could be trucated to 0
           for _, x1, z1, x2, z2 in msgStr[1]:
             svgLines.append("""
               <path d="M%d %d L%d %d" style="stroke-width: %d" />
