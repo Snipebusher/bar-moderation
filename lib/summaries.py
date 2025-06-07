@@ -289,7 +289,6 @@ def buildReplayPage(filename: str):
           medsize = max(maxx - minx, maxz - minz) / 2 + 10
           svgSize = 100
           strokSize = math.ceil(medsize / svgSize) #never set stroke to something that could be trucated to 0
-          print("size = ", strokSize)
           for _, x1, z1, x2, z2 in msgStr[1]:
             svgLines.append("""
               <path d="M%d %d L%d %d" style="stroke-width: %d" />
