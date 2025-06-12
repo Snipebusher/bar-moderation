@@ -387,9 +387,8 @@ def setupTeamColors(game: dict):
   
   colorNumByTeam: dict[int, int] = defaultdict(lambda: 0)
   colorByPlayer: dict[int, tuple[float, float, float]] = {}
-
   for teamid, team in enumerate(game["team"]):
-    playerid, player = next(((playerid, player) for (playerid, player) in enumerate(game["player"]) if player["team"] == teamid), (-1, None))
+    playerid, player = next(((playerid, player) for (playerid, player) in enumerate(game["player"]) if player.get("team", -1) == teamid), (-1, None))
     if not team or not player: continue
 
     allyTeamid = team["allyteam"]
