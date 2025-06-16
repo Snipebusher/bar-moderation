@@ -14,7 +14,7 @@ def buildPath(filename: str):
   if os.name != "posix" and ".sdfz" in filename:
     htmltop ="""<div id="path">
       <button onclick="openSelectPath()">Choose File</button>
-      <button onclick="runReplay('{}')">Start Replay</button>
+      <button onclick="runReplay('{}')" title="Run the current replay using the debug launcher">Start Replay</button>
   {}
   </div>""".format(filenameToSend, "\n".join(
       """<a href="/view/{}">{}{}</a>""".format(
