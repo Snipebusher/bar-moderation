@@ -3,6 +3,7 @@ import pathlib
 import urllib.parse
 import os
 import traceback
+import json
 from .directories import buildDirectoryPage
 from .summaries import buildReplayPage
 from .pages import buildErrorPage
@@ -47,3 +48,39 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
       self.send_response(307, "Temporary Redirect")
       self.send_header('Location', "/view/%s" % (defaultPath.removeprefix("/")))
       self.end_headers()
+
+
+  def do_POST(self):
+    self.path = self.path.replace("%22", "") # Credit to fritman1
+    url = urllib.parse.urlparse(self.path)
+    path = url.path.strip("/") + "/"
+    if path.startswith("runReplay/"):
+      content_length = int(self.headers['Content-Length'])
+      post_data = self.rfile.read(content_length)
+      try:
+        # Decode the data and parse it as JSON
+        json_data = json.loads(post_data.decode('utf-8'))
+        filename = json_data.get('filename')  # Access the filename from the JSON object
+        # Print the received message
+        print("Run replay :", filename)
+      except json.JSONDecodeError as e:
+        print("Error decoding JSON !:", e)
+        self.send_response(400)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps({'status': 'error', 'message': 'Unknown message'}).encode('utf-8'))
+      goodfilename = filename.replace("//", "\\")
+      if ".sdfz" in goodfilename:
+        try:
+          os.startfile(goodfilename)
+        except Exception:
+          print("Error starting replay, make sure you have the debug launcher installed and set as default application for opening replay files (.sdfz)")
+          self.send_response(400)
+          self.send_header('Content-type', 'application/json')
+          self.end_headers()
+          self.wfile.write(json.dumps({'status': 'error', 'message': "Error starting replay, make sure you have the debug launcher installed and set as default application for opening replay files (.sdfz)"}).encode('utf-8'))
+        else:
+          self.send_response(200)
+          self.send_header('Content-type', 'application/json')
+          self.end_headers()
+          self.wfile.write(json.dumps({'status': 'success'}).encode('utf-8'))

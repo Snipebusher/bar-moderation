@@ -1,20 +1,40 @@
 import pathlib
 import urllib.parse
+import os
 
 def buildPath(filename: str):
+  filenameToSend = filename.replace("\\", "//")
   pathItems = [pathlib.Path(filename)]
   while True:
     last = pathItems[-1]
     if last.parent == last:
       break
     pathItems.append(last.parent)
-  return """<div id="path">
-  <button onclick="openSelectPath()">Choose File</button>
-%s
-</div>""" % "\n".join("""
-  <a href="/view/%s">%s</a>
-""" % (str(item).strip("/"), item.name + ("/" if index else "") if item.name else str(item))
-         for (index, item) in reversed(list(enumerate(pathItems))))
+  htmltop = ""
+  if os.name != "posix" and ".sdfz" in filename:
+    htmltop ="""<div id="path">
+      <button onclick="openSelectPath()">Choose File</button>
+      <button onclick="runReplay('{}')" title="Run the current replay using the debug launcher">Start Replay</button>
+  {}
+  </div>""".format(filenameToSend, "\n".join(
+      """<a href="/view/{}">{}{}</a>""".format(
+          str(item).strip("/"),
+          item.name,
+          "/" if index else "" if item.name else str(item))
+        for (index, item) in reversed(list(enumerate(pathItems)))))
+  else:
+    htmltop ="""<div id="path">
+      <button onclick="openSelectPath()">Choose File</button>
+  {}
+  </div>""".format("\n".join(
+      """<a href="/view/{}">{}{}</a>""".format(
+          str(item).strip("/"),
+          item.name,
+          "/" if index else "" if item.name else str(item))
+        for (index, item) in reversed(list(enumerate(pathItems)))))
+  return htmltop
+
+
 
 def buildPage(filename: str, content: str, *, style="", script=""):
     return """
@@ -211,6 +231,23 @@ function openSelectPath() {
   const path = prompt("GOTO path")
   if (!path) return
   window.location = "/view/" + path.replace(/^\\/+|\\/+$/g, "")
+}
+function runReplay(filename) {
+  fetch('/runReplay', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ filename: filename }),
+  })
+  .then(response => response.json())
+  .then(data => {
+  if(data.status == "error") {
+    alert(data.message)
+  }
+  else{
+  console.log(data.message)}})
+  .catch(error => console.error('Error:', error));
 }
 function toggleCollapsableVisibility(collapser) {
   const text = collapser.lastChild.textContent
