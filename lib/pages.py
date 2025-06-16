@@ -20,8 +20,8 @@ def buildPath(filename: str):
       """<a href="/view/{}">{}{}</a>""".format(
           str(item).strip("/"),
           item.name,
-          "/" if index else "" if item.name else str(item)
-      ) for (index, item) in reversed(list(enumerate(pathItems)))))
+          "/" if index else "" if item.name else str(item))
+        for (index, item) in reversed(list(enumerate(pathItems)))))
   else:
     htmltop ="""<div id="path">
       <button onclick="openSelectPath()">Choose File</button>
@@ -30,8 +30,8 @@ def buildPath(filename: str):
       """<a href="/view/{}">{}{}</a>""".format(
           str(item).strip("/"),
           item.name,
-          "/" if index else "" if item.name else str(item)
-      ) for (index, item) in reversed(list(enumerate(pathItems)))))
+          "/" if index else "" if item.name else str(item))
+        for (index, item) in reversed(list(enumerate(pathItems)))))
   return htmltop
 
 
