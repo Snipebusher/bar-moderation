@@ -74,7 +74,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         try:
           os.startfile(goodfilename)
         except Exception:
-          print("Error starting replay, make sure you have the debug launcher installed and set as default application for openning replay files (.sfbz)")
+          print("Error starting replay, make sure you have the debug launcher installed and set as default application for opening replay files (.sdfz)")
           self.send_response(400)
           self.send_header('Content-type', 'application/json')
           self.end_headers()
