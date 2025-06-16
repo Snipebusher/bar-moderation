@@ -239,7 +239,15 @@ function runReplay(filename) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ filename: filename }),
-  });
+  })
+  .then(response => response.json())
+  .then(data => {
+  if(data.status == "error") {
+    alert(data.message)
+  }
+  else{
+  console.log(data.message)}})
+  .catch(error => console.error('Error:', error));
 }
 function toggleCollapsableVisibility(collapser) {
   const text = collapser.lastChild.textContent

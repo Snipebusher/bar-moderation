@@ -65,9 +65,22 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         print("Run replay :", filename)
       except json.JSONDecodeError as e:
         print("Error decoding JSON !:", e)
+        self.send_response(400)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps({'status': 'error', 'message': 'Unknown message'}).encode('utf-8'))
       goodfilename = filename.replace("//", "\\")
       if ".sdfz" in goodfilename:
         try:
           os.startfile(goodfilename)
         except Exception:
           print("Error starting replay, make sure you have the debug launcher installed and set as default application for openning replay files (.sfbz)")
+          self.send_response(400)
+          self.send_header('Content-type', 'application/json')
+          self.end_headers()
+          self.wfile.write(json.dumps({'status': 'error', 'message': "Error starting replay, make sure you have the debug launcher installed and set as default application for openning replay files (.sfbz)"}).encode('utf-8'))
+        else:
+          self.send_response(200)
+          self.send_header('Content-type', 'application/json')
+          self.end_headers()
+          self.wfile.write(json.dumps({'status': 'success'}).encode('utf-8'))
