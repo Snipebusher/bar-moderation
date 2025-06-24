@@ -14,7 +14,7 @@ def buildPath(filename: str):
   if os.name != "posix" and ".sdfz" in filename:
     htmltop ="""<div id="path">
       <button onclick="openSelectPath()">Choose File</button>
-      <button onclick="runReplay('{}')" title="Run the current replay using the debug launcher">Start Replay</button>
+      <button onclick="runReplay('{}')" class="tooltip" data-tooltip="Run the current replay using the debug launcher" aria-label="Run the current replay using the debug launcher">Start Replay</button>
   {}
   </div>""".format(filenameToSend, "\n".join(
       """<a href="/view/{}">{}{}</a>""".format(
@@ -134,18 +134,27 @@ THEME = """
   --filter-player-bg: black;
   --draw-color: white;
 }
-
-body {
-  background-color: var(--background-color);
-  color: var(--text-color);
-}
 """
 
 STYLE = """
 body {
+  background-color: var(--background-color);
+  color: var(--text-color);
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
+}
+.tooltip-popup {
+  position: absolute;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border: 1px solid var(--text-color);
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1000;
 }
 .collapsable {
   background-color: var(--collapsible-bg);
@@ -336,4 +345,84 @@ window.addEventListener("load", () => {
     }
   }
 })
+document.addEventListener('DOMContentLoaded', function() {
+  const hoverDelay = 500;
+  const offsetX = 10;
+  const offsetY = 20;
+
+  document.querySelectorAll('.tooltip').forEach(el => {
+    let timer = null;
+    let tooltipEl = null;
+    let shownOnce = false;
+    let lastX = 0, lastY = 0;
+
+    function clearTooltipAndTimer() {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      if (tooltipEl) {
+        tooltipEl.remove();
+        tooltipEl = null;
+      }
+    }
+
+    el.addEventListener('mouseenter', e => {
+      // Reset for new hover-enter
+      shownOnce = false;
+      clearTooltipAndTimer();
+      lastX = e.pageX;
+      lastY = e.pageY;
+      // Start timer to show
+      timer = setTimeout(() => {
+        const text = el.getAttribute('data-tooltip');
+        if (!text) return;
+        tooltipEl = document.createElement('div');
+        tooltipEl.className = 'tooltip-popup';
+        tooltipEl.textContent = text;
+        document.body.appendChild(tooltipEl);
+        tooltipEl.style.left = (lastX + offsetX) + 'px';
+        tooltipEl.style.top  = (lastY + offsetY) + 'px';
+        shownOnce = true;
+        timer = null;
+      }, hoverDelay);
+    });
+
+    el.addEventListener('mousemove', e => {
+      lastX = e.pageX;
+      lastY = e.pageY;
+      if (!shownOnce) {
+        if (timer) {
+          clearTimeout(timer);
+        }
+        timer = setTimeout(() => {
+          const text = el.getAttribute('data-tooltip');
+          if (!text) return;
+          tooltipEl = document.createElement('div');
+          tooltipEl.className = 'tooltip-popup';
+          tooltipEl.textContent = text;
+          document.body.appendChild(tooltipEl);
+          tooltipEl.style.left = (lastX + offsetX) + 'px';
+          tooltipEl.style.top  = (lastY + offsetY) + 'px';
+          shownOnce = true;
+          timer = null;
+        }, hoverDelay);
+      } else {
+        if (tooltipEl) {
+          tooltipEl.remove();
+          tooltipEl = null;
+        }
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+      }
+    });
+
+    el.addEventListener('mouseleave', e => {
+      clearTooltipAndTimer();
+      shownOnce = false;
+    });
+  });
+});
 """
