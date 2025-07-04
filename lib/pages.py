@@ -353,11 +353,11 @@ function updateContextMenu(playerId) {
   //add menu option based on RealPLayerId recorded into the data field
   let menuOptions = [];
   menuOptions = [
-        { text: 'profile', action: function() { window.open(profileLink); } },
-        { text: 'reports', action: function() { window.open(reportProfileLink);}},
-        { text: 'actions', action: function() { window.open(actionProfileLink); } },
-        { text: 'details', action: function() { window.open(detailProfileLink); } },
-        { text: 'mod reports', action: function() { window.open(reportsModLink); } }
+        { text: 'Profile', action: function() { window.open(profileLink); } },
+        { text: 'Reports', action: function() { window.open(reportProfileLink);}},
+        { text: 'Actions', action: function() { window.open(actionProfileLink); } },
+        { text: 'Details', action: function() { window.open(detailProfileLink); } },
+        //{ text: 'mod reports', action: function() { window.open(reportsModLink); } }
     ];
   // Add menu options to the context menu
   menuOptions.forEach(option => {
