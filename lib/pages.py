@@ -67,12 +67,9 @@ def buildPage(filename: str, content: str, *, style="", script=""):
     </script>
   </head>
   <body>
-   {path}
+        {path}
     <div id="mainContent">
       {content}
-    </div>
-    <div class="context-menu" id="contextFilterMenu">
-      <!-- Menu options will be inserted here dynamically -->
     </div>
     <div id="settingsModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:1500;">
       <div style="background-color:var(--background-color);color:var(--text-color);width:95%;max-width:1200px;max-height:95%;overflow-y:auto;padding:20px;border-radius:8px;position:relative;">
@@ -156,21 +153,6 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-}
-.context-menu {
-  position: absolute;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-  display: none;
-  z-index: 1000;
-}
-.context-menu div {
-  padding: 8px 16px;
-  cursor: pointer;
-}
-.context-menu div:hover {
-  background-color: #e0e0e0;
 }
 .tooltip-popup {
   position: absolute;
@@ -335,35 +317,6 @@ function fixFilterCheckboxes(container) {
     }
   }
 }
-
-function updateContextMenu(playerId) {
-  const contextMenu = document.getElementById('contextFilterMenu');
-  console.log(contextMenu);
-  contextMenu.innerHTML = ''; // Clear existing menu options
-  console.log("hello there");
-  let profileLink = "https://server4.beyondallreason.info/profile/" + playerId;
-  let reportProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId;
-  let actionProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#actions_tab";
-  let detailProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#user_details_tab";
-  //let reportsModLink =  "https://server4.beyondallreason.info/moderation/report?target_id="+playerId;
-  //add menu option based on RealPLayerId recorded into the data field
-  let menuOptions = [];
-  menuOptions = [
-        { text: 'Profile', action: function() { window.open(profileLink); } },
-        { text: 'Reports', action: function() { window.open(reportProfileLink);}},
-        { text: 'Actions', action: function() { window.open(actionProfileLink); } },
-        { text: 'Details', action: function() { window.open(detailProfileLink); } },
-        //{ text: 'mod reports', action: function() { window.open(reportsModLink); } }
-    ];
-  // Add menu options to the context menu
-  menuOptions.forEach(option => {
-      const menuItem = document.createElement('div');
-      menuItem.textContent = option.text;
-      menuItem.addEventListener('click', option.action);
-      contextMenu.appendChild(menuItem);
-  });
-}
-
 function updateFilterCheckboxes(container, updatedCheckbox) {
   if (!isFilterCheckbox(updatedCheckbox)) return
   const childClass = "parent-" + updatedCheckbox.value
@@ -466,27 +419,6 @@ document.addEventListener('DOMContentLoaded', function() {
       clearTooltipAndTimer();
       shownOnce = false;
     });
-  });
-const labels = document.querySelectorAll('label');
-const contextMenu = document.getElementById('contextFilterMenu');
-let currentLabel = null;
-labels.forEach(label => {
-    label.addEventListener('contextmenu', function(e) {
-    //we reject if no player- in class name
-    if (!Array.from(label.classList).some(className => className.startsWith('player-'))) {
-      return; // Skip showing the context menu for this label
-    }
-    e.preventDefault();
-    currentLabel = label;
-    const playerId = label.dataset.id;
-    updateContextMenu(playerId);
-    contextMenu.style.display = 'block';
-    contextMenu.style.left = e.pageX + 'px';
-    contextMenu.style.top = e.pageY + 'px';
-    });
-  });
-  document.addEventListener('click', function() {
-    contextMenu.style.display = 'none';
   });
 });
 """
