@@ -350,8 +350,7 @@ function updateContextMenu(playerId) {
   let actionProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#actions_tab";
   let detailProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#user_details_tab";
   let reportsModLink =  "https://server4.beyondallreason.info/moderation/report?target_id="+playerId;
-
-  // Define menu options based on the span text
+  //add menu option based on RealPLayerId recorded into the data field
   let menuOptions = [];
   menuOptions = [
         { text: 'profile', action: function() { window.open(profileLink); } },
@@ -479,7 +478,7 @@ const contextMenu = document.getElementById('contextFilterMenu');
 let currentLabel = null;
 labels.forEach(label => {
     label.addEventListener('contextmenu', function(e) {
-    // Check if the label's class contains "player"
+    //we reject if no player- in class name
     if (!Array.from(label.classList).some(className => className.startsWith('player-'))) {
       return; // Skip showing the context menu for this label
     }
