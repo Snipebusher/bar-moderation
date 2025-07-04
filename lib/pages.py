@@ -345,7 +345,7 @@ function updateContextMenu(playerId) {
   console.log(contextMenu);
   contextMenu.innerHTML = ''; // Clear existing menu options
   console.log("hello there");
-  let profileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId;
+  let profileLink = "https://server4.beyondallreason.info/profile/" + playerId;
   let reportProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId;
   let actionProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#actions_tab";
   let detailProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#user_details_tab";
