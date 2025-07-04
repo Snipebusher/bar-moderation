@@ -90,6 +90,11 @@ document.addEventListener("DOMContentLoaded", function () {{
   <body>
 {path}
 {content}
+  
+  <div class="context-menu" id="contextFilterMenu">
+    <!-- Menu options will be inserted here dynamically -->
+  </div>
+  
   </body>
   <select id="themeSelector">
     <option value="system">Device</option>
@@ -143,6 +148,21 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
+}
+.context-menu {
+  position: absolute;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  display: none;
+  z-index: 1000;
+}
+.context-menu div {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.context-menu div:hover {
+  background-color: #e0e0e0;
 }
 .tooltip-popup {
   position: absolute;
@@ -319,6 +339,36 @@ function fixFilterCheckboxes(container) {
     }
   }
 }
+
+function updateContextMenu(playerId) {
+  const contextMenu = document.getElementById('contextFilterMenu');
+  console.log(contextMenu);
+  contextMenu.innerHTML = ''; // Clear existing menu options
+  console.log("hello there");
+  let profileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId;
+  let reportProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId;
+  let actionProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#actions_tab";
+  let detailProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#user_details_tab";
+  let reportsModLink =  "https://server4.beyondallreason.info/moderation/report?target_id="+playerId;
+
+  // Define menu options based on the span text
+  let menuOptions = [];
+  menuOptions = [
+        { text: 'profile', action: function() { window.open(profileLink); } },
+        { text: 'reports', action: function() { window.open(reportProfileLink);}},
+        { text: 'actions', action: function() { window.open(actionProfileLink); } },
+        { text: 'details', action: function() { window.open(detailProfileLink); } },
+        { text: 'mod reports', action: function() { window.open(reportsModLink); } }
+    ];
+  // Add menu options to the context menu
+  menuOptions.forEach(option => {
+      const menuItem = document.createElement('div');
+      menuItem.textContent = option.text;
+      menuItem.addEventListener('click', option.action);
+      contextMenu.appendChild(menuItem);
+  });
+}
+
 function updateFilterCheckboxes(container, updatedCheckbox) {
   if (!isFilterCheckbox(updatedCheckbox)) return
   const childClass = "parent-" + updatedCheckbox.value
@@ -423,6 +473,27 @@ document.addEventListener('DOMContentLoaded', function() {
       clearTooltipAndTimer();
       shownOnce = false;
     });
+  });
+const labels = document.querySelectorAll('label');
+const contextMenu = document.getElementById('contextFilterMenu');
+let currentLabel = null;
+labels.forEach(label => {
+    label.addEventListener('contextmenu', function(e) {
+    // Check if the label's class contains "player"
+    if (!Array.from(label.classList).some(className => className.startsWith('player-'))) {
+      return; // Skip showing the context menu for this label
+    }
+    e.preventDefault();
+    currentLabel = label;
+    const playerId = label.dataset.id;
+    updateContextMenu(playerId);
+    contextMenu.style.display = 'block';
+    contextMenu.style.left = e.pageX + 'px';
+    contextMenu.style.top = e.pageY + 'px';
+    });
+  });
+  document.addEventListener('click', function() {
+    contextMenu.style.display = 'none';
   });
 });
 """
