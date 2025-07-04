@@ -349,7 +349,7 @@ function updateContextMenu(playerId) {
   let reportProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId;
   let actionProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#actions_tab";
   let detailProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#user_details_tab";
-  let reportsModLink =  "https://server4.beyondallreason.info/moderation/report?target_id="+playerId;
+  //let reportsModLink =  "https://server4.beyondallreason.info/moderation/report?target_id="+playerId;
   //add menu option based on RealPLayerId recorded into the data field
   let menuOptions = [];
   menuOptions = [
