@@ -127,7 +127,8 @@ THEME = """
 [data-theme="light"] {
   --background-color: white;
   --text-color: black;
-  --border-color: #ccc
+  --border-color: #ccc;
+  --hover-bg: #e0e0e0;
   --button-background: #007bff;
   --button-hover: #0056b3;
   --link-color: #1abc9c;
@@ -140,7 +141,8 @@ THEME = """
 [data-theme="dark"] {
   --background-color: #121212;
   --text-color: white;
-  --border-color: #444
+  --border-color: #444;
+  --hover-bg: #333333;
   --button-background: #007bff;
   --button-hover: #0056b3;
   --link-color: #1abc9c;
@@ -172,7 +174,7 @@ body {
   cursor: pointer;
 }
 .context-menu div:hover {
-  background-color: #e0e0e0;
+  background-color: var(--hover-bg);
 }
 .tooltip-popup {
   position: absolute;
