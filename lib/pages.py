@@ -349,15 +349,15 @@ function updateContextMenu(playerId) {
   let reportProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId;
   let actionProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#actions_tab";
   let detailProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#user_details_tab";
-  let reportsModLink =  "https://server4.beyondallreason.info/moderation/report?target_id="+playerId;
+  //let reportsModLink =  "https://server4.beyondallreason.info/moderation/report?target_id="+playerId;
   //add menu option based on RealPLayerId recorded into the data field
   let menuOptions = [];
   menuOptions = [
-        { text: 'profile', action: function() { window.open(profileLink); } },
-        { text: 'reports', action: function() { window.open(reportProfileLink);}},
-        { text: 'actions', action: function() { window.open(actionProfileLink); } },
-        { text: 'details', action: function() { window.open(detailProfileLink); } },
-        { text: 'mod reports', action: function() { window.open(reportsModLink); } }
+        { text: 'Profile', action: function() { window.open(profileLink); } },
+        { text: 'Reports', action: function() { window.open(reportProfileLink);}},
+        { text: 'Actions', action: function() { window.open(actionProfileLink); } },
+        { text: 'Details', action: function() { window.open(detailProfileLink); } }//,
+        //{ text: 'mod reports', action: function() { window.open(reportsModLink); } }
     ];
   // Add menu options to the context menu
   menuOptions.forEach(option => {
