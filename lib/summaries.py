@@ -354,7 +354,7 @@ def buildReplayPage(filename: str):
       players = playersByTeam[key]
       if not players: continue
       _, cls, name = key
-
+                              #here we populate player "teams"
       checkboxesLines.append("""
     <div class="filter-team">
       <label class="filter-{cls}">
@@ -366,11 +366,11 @@ def buildReplayPage(filename: str):
       </div>
     </div>
 """.format(cls=cls, name=name, children="".join("""
-        <label class="player-{playerid} filter-player filter-player-{playerid}">
+        <label class="player-{playerid} filter-player filter-player-{playerid}" data-id="{playerRealId}">
           <input type="checkbox" class="parent-filter-{cls}" value="filter-player-{playerid}" checked />
           <span>{playername}</span>
         </label>
-""".format(cls=cls, playerid=player.index, playername=html.escape(player.name)) for player in players)))
+""".format(cls=cls, playerid=player.index, playername=html.escape(player.name), playerRealId=player.id) for player in players))) #here we populate the filter player
     
     filtersStyles: list[str] = []
     
