@@ -127,6 +127,7 @@ THEME = """
 [data-theme="light"] {
   --background-color: white;
   --text-color: black;
+  --border-color: #ccc
   --button-background: #007bff;
   --button-hover: #0056b3;
   --link-color: #1abc9c;
@@ -139,6 +140,7 @@ THEME = """
 [data-theme="dark"] {
   --background-color: #121212;
   --text-color: white;
+  --border-color: #444
   --button-background: #007bff;
   --button-hover: #0056b3;
   --link-color: #1abc9c;
@@ -159,8 +161,8 @@ body {
 }
 .context-menu {
   position: absolute;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
   display: none;
   z-index: 1000;
