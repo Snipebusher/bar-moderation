@@ -20,3 +20,8 @@ foreach ($command in $pythonCommands) {
         Write-Host "$command is not available, trying the next command..."
     }
 }
+# If none of the commands worked, open the default browser to the Python official website
+if (-not $scriptStarted) {
+    Write-Host "None of the Python commands worked. Opening the default browser to the Python official website..."
+    Start-Process "https://www.python.org"
+}
