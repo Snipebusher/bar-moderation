@@ -19,4 +19,4 @@ Feel free to use and modify.
 |  | Download the latest version of Python and install it as any other program. It is advised to follow the default installation path. |
 | 6 | (Optional) In order to use the ability to start a replay directly from the tool, you have to install the BAR debug launcher. See instructions on the GitHub page: [BAR Debug Launcher](https://github.com/beyond-all-reason/bar_debug_launcher). Don't forget to set the debug launcher as the default app for opening replay files. |
 
-Snipebusher este very good at github <3
+Snipebusher is very good at GitHub. It took him only 3 attempts to make the rules work. <3
