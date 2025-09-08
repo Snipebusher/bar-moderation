@@ -2,10 +2,6 @@
 
 `python3 main.py` will run a HTTP server useful for listing and view replays.
 
-Tested on Windows.
-
-
-Feel free to use and modify.
 
 # SETUP
 

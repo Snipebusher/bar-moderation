@@ -254,7 +254,7 @@ def buildReplayPage(filename: str):
     return """
 <div id="script">
   <h3 class="collapser">Script [+]</h3>
-  <pre class="collapsable">
+  <pre class="collapsable" style="white-space: pre-wrap; word-wrap: break-word;">
 %s
   </pre>
 </div>
@@ -366,7 +366,7 @@ def buildReplayPage(filename: str):
       </div>
     </div>
 """.format(cls=cls, name=name, children="".join("""
-        <label class="player-{playerid} filter-player filter-player-{playerid}" data-id="{playerRealId}">
+        <label class="player-{playerid} filter-player filter-player-{playerid}" data-id="{playerRealId}" data-name="{playername}">
           <input type="checkbox" class="parent-filter-{cls}" value="filter-player-{playerid}" checked />
           <span>{playername}</span>
         </label>
@@ -450,15 +450,6 @@ STYLE = """
   flex: 1 1;
 }
 
-h1 {
-  margin-left: 10;
-}
-
-h3 {
-  margin-left: 10;
-  cursor: pointer;
-}
-
 #log-table {
   --player-color: lightGrey;
   --border-width: 4px;
@@ -475,7 +466,7 @@ h3 {
   top: 0;
   z-index: 100;
   background-color: white;
-  border-radius: 5px;
+  border-radius: 10px;
 }
 
 #log-table .filters .collapser {
@@ -559,7 +550,7 @@ label {
 
 #log-table svg path {
   fill: none;
-  stroke: var(--draw-color);
+  stroke: var(--text-color);
 }
 
 #log-table tr.player-255 {
