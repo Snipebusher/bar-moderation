@@ -367,7 +367,7 @@ function fixFilterCheckboxes(container) {
   }
 }
 
-function updateContextMenu(playerId) {
+function updateContextMenu(playerId, playerName) {
   const contextMenu = document.getElementById('contextFilterMenu');
   console.log(contextMenu);
   contextMenu.innerHTML = ''; // Clear existing menu options
@@ -378,7 +378,7 @@ function updateContextMenu(playerId) {
   let detailProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#user_details_tab";
   //let reportsModLink =  "https://server4.beyondallreason.info/moderation/report?target_id=" + playerId;
   let gexProfileLink = "https://gex.honu.pw/user/" + playerId;
-  let bearProfileLink = "https://www.bar-stats.pro/playerstats?playerName=" + name;
+  let bearProfileLink = "https://www.bar-stats.pro/playerstats?playerName=" + playerName;
   //add menu option based on RealPLayerId recorded into the data field
   let menuOptions = [];
   menuOptions = [
@@ -517,7 +517,8 @@ labels.forEach(label => {
     e.preventDefault();
     currentLabel = label;
     const playerId = label.dataset.id;
-    updateContextMenu(playerId);
+    const playerName = label.dataset.name;
+    updateContextMenu(playerId, playerName);
     contextMenu.style.display = 'block';
     contextMenu.style.left = e.pageX + 'px';
     contextMenu.style.top = e.pageY + 'px';

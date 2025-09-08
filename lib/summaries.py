@@ -366,7 +366,7 @@ def buildReplayPage(filename: str):
       </div>
     </div>
 """.format(cls=cls, name=name, children="".join("""
-        <label class="player-{playerid} filter-player filter-player-{playerid}" data-id="{playerRealId}">
+        <label class="player-{playerid} filter-player filter-player-{playerid}" data-id="{playerRealId}" data-name="{playername}">
           <input type="checkbox" class="parent-filter-{cls}" value="filter-player-{playerid}" checked />
           <span>{playername}</span>
         </label>
