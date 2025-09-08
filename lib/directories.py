@@ -38,7 +38,7 @@ def buildDirectoryPage(dir: str):
 """ % (
       "+" if replayFiles else "-",
       "".join("""
-<span><a href="/view/%s">%s/</a></span>
+<span><a href="/view/%s"style="all: unset; color: var(--link-color); cursor: pointer;">%s</a></span>
 """ % (
         str(subdir).removeprefix("/"),
         subdir.name,
@@ -106,7 +106,7 @@ def buildDirectoryPage(dir: str):
 
     return """
 <div>
-  <h3>Replays</h3>
+  <h3 style="cursor: default;">Replays</h3>
   <table id="replays">
     <thead>
       <th>Time</th>
@@ -126,7 +126,6 @@ def buildDirectoryPage(dir: str):
 
 STYLE = """
 #subdirs .collapsable {
-  display: flex;
   flex-wrap: wrap;
 }
 
@@ -134,14 +133,14 @@ STYLE = """
   display: inline-block;
   min-width: 200px;
   margin: 5px;
-  padding: 1px 7px;
+  padding: 5px 10px;
   border: 1px solid lightGrey;
   border-radius: 5px;
 }
 
 #replays .team {
   display: flex;
-  padding: 3px 2px;
+  padding: 5px 15px;
   margin: 2px;
 }
 
@@ -152,7 +151,7 @@ STYLE = """
 
 #replays .player {
   display: inline-block;
-  background-color: white;
+  background-color: var(--background-color);
   border-width: 2px;
   border-left-width: 12px;
   border-style: solid;
@@ -161,12 +160,21 @@ STYLE = """
   border-radius: 4px;
 }
 
+th {
+  border-bottom: 3px solid lightGrey;
+  padding-bottom: 5px;
+}
+
+td {
+  height: 85px;
+}
+
 #replays td {
   border-bottom: 2px solid lightGrey;
 }
 
 #replays td:nth-child(1) {
-  min-width: 145px;
+  width: 140px;
   text-align: center;
 }
 
@@ -182,8 +190,7 @@ STYLE = """
 
 #replays td:nth-child(4) {
   min-width: 80px;
-  text-align: right;
-  padding-right: 10px;
+  text-align: center;
 }
 
 #replays td:nth-child(5) {
