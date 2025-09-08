@@ -23,7 +23,7 @@ def buildPath(filename: str):
     if item.name or (item.drive and index == len(pathItems) - 1)
 )
 
-  choose_file = '<button onclick="openSelectPath()">Choose File</button>'
+  choose_file = '<button onclick="openSelectPath()" style="margin-right:5px;">Choose File</button>'
   start_replay = f'<button onclick="runReplay(\'{filenameToSend}\')" class="tooltip" data-tooltip="Run the current replay using the debug launcher" aria-label="Run the current replay using the debug launcher">Start Replay</button>' if os.name != "posix" and ".sdfz" in filename else ""
 
   settings_btn = """
@@ -36,7 +36,7 @@ def buildPath(filename: str):
 """
 
   return f"""
-<div id="path" style="display:flex;justify-content:space-between;align-items:center;padding:10px;background-color:rgba(0,0,0,0.1);border-bottom:1px solid rgba(0,0,0,0.2);">
+<div id="path" style="display:flex;justify-content:space-between;align-items:center;padding:10px;">
   <div>
     {choose_file}
     {start_replay}
@@ -77,7 +77,7 @@ def buildPage(filename: str, content: str, *, style="", script=""):
         <h2 style="margin-top:0;">Settings</h2>
         <div style="margin-top:10px;">
           <label for="themeSelector" style="display:block;margin-bottom:5px;">Theme:</label>
-          <select id="themeSelector" style="width:100%;padding:8px;background-color:var(--background-color);color:var(--text-color);border:1px solid var(--text-color);border-radius:4px;">
+          <select id="themeSelector" style="width:100px;padding:8px;background-color:var(--background-color);color:var(--text-color);border:1px solid var(--text-color);border-radius:4px;">
             <option value="system">Device</option>
             <option value="light">Light</option>
             <option value="dark">Dark</option>
@@ -100,7 +100,7 @@ def buildPage(filename: str, content: str, *, style="", script=""):
             </a>
           </div>
           <div style="flex:1;text-align:right;">
-            v1.3
+            v1.3.1
           </div>
         </div>
       </div>
@@ -133,9 +133,8 @@ THEME = """
   --button-hover: #0056b3;
   --link-color: #1abc9c;
   --link-hover: #16a085;
-  --collapsible-bg: white;
+  --collapsible-bg: #eeeeee;
   --filter-player-bg: white;
-  --draw-color: black;
 }
 
 [data-theme="dark"] {
@@ -149,7 +148,6 @@ THEME = """
   --link-hover: #48c9b0;
   --collapsible-bg: #0f0f0f;
   --filter-player-bg: black;
-  --draw-color: white;
 }
 """
 
@@ -161,6 +159,7 @@ body {
   margin: 0;
   padding: 0;
 }
+
 .context-menu {
   position: absolute;
   background-color: var(--background-color);
@@ -169,13 +168,16 @@ body {
   display: none;
   z-index: 1000;
 }
+
 .context-menu div {
   padding: 8px 16px;
   cursor: pointer;
 }
+
 .context-menu div:hover {
   background-color: var(--hover-bg);
 }
+
 .tooltip-popup {
   position: absolute;
   background-color: var(--background-color);
@@ -188,15 +190,19 @@ body {
   pointer-events: none;
   z-index: 1000;
 }
+
 .collapsable {
   background-color: var(--collapsible-bg);
   color: var(--text-color);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
   padding: 10px;
 }
+
 .collapsed .collapsable {
   display: none;
 }
+
 button {
   background-color: var(--button-background);
   color: white;
@@ -206,27 +212,32 @@ button {
   border-radius: 5px;
   cursor: pointer;
 }
+
 button:hover {
   background-color: var(--button-hover);
 }
+
 #themeSelector:hover {
   background-color: var(--button-hover);
 }
+
 #path {
   padding: 10px;
   background-color: rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid var(--border-color);
 }
+
 #path a {
-  color: white;
   text-decoration: none;
   margin-left: 20px;
   margin-right: -20px;
 }
+
 #path a:hover {
   text-decoration: underline;
   background-color: var(--link-hover);
 }
+
 a {
   background-color: var(--link-color);
   color: white;
@@ -236,21 +247,35 @@ a {
   text-decoration: none;
   display: inline-block;
 }
+
 a:hover {
   text-decoration: none;
   background-color: var(--link-hover);
 }
+
+h1 {
+  margin-left: 10;
+}
+
+h3 {
+  margin-left: 10;
+  cursor: pointer;
+}
+
 input, select, textarea {
   background-color: var(--background-color);
   color: var(--text-color);
   border: 1px solid var(--text-color);
 }
+
 input::placeholder, textarea::placeholder {
   color: rgba(255, 255, 255, 0.6);
 }
+
 input[type="checkbox"], input[type="radio"] {
   filter: invert(1);
 }
+
 [data-theme="light"] input[type="checkbox"], [data-theme="light"] input[type="radio"] {
   filter: invert(0);
 }
@@ -298,9 +323,11 @@ function fixCollapsableVisibility(collapser) {
     collapser.parentElement.classList.remove("collapsed")
   }
 }
+
 function isFilterCheckbox(checkbox) {
   return checkbox.type === "checkbox" && checkbox.value.startsWith("filter-")
 }
+
 function fixFilterCheckboxes(container) {
   const checkboxes = container.getElementsByTagName("input")
   const checked = {}
@@ -346,18 +373,22 @@ function updateContextMenu(playerId) {
   contextMenu.innerHTML = ''; // Clear existing menu options
   console.log("hello there");
   let profileLink = "https://server4.beyondallreason.info/profile/" + playerId;
-  let reportProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId;
+  //let reportProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId;
   let actionProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#actions_tab";
   let detailProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#user_details_tab";
-  //let reportsModLink =  "https://server4.beyondallreason.info/moderation/report?target_id="+playerId;
+  //let reportsModLink =  "https://server4.beyondallreason.info/moderation/report?target_id=" + playerId;
+  let gexProfileLink = "https://gex.honu.pw/user/" + playerId;
+  let bearProfileLink = "https://www.bar-stats.pro/playerstats?playerName=" + name;
   //add menu option based on RealPLayerId recorded into the data field
   let menuOptions = [];
   menuOptions = [
         { text: 'Profile', action: function() { window.open(profileLink); } },
-        { text: 'Reports', action: function() { window.open(reportProfileLink);}},
+        //{ text: 'Reports', action: function() { window.open(reportProfileLink);}},
         { text: 'Actions', action: function() { window.open(actionProfileLink); } },
-        { text: 'Details', action: function() { window.open(detailProfileLink); } }//,
-        //{ text: 'mod reports', action: function() { window.open(reportsModLink); } }
+        { text: 'Details', action: function() { window.open(detailProfileLink); } },
+        //{ text: 'Mod Reports', action: function() { window.open(reportsModLink); } },
+        { text: 'Gex', action: function() { window.open(gexProfileLink); } },
+        { text: 'BarStats', action: function() { window.open(bearProfileLink); } }
     ];
   // Add menu options to the context menu
   menuOptions.forEach(option => {
@@ -381,6 +412,7 @@ function updateFilterCheckboxes(container, updatedCheckbox) {
   }
   fixFilterCheckboxes(container)
 }
+
 window.addEventListener("load", () => {
   const filterContainers = document.getElementsByClassName("filters")
   for (let index = 0; index < filterContainers.length; index++) {
@@ -394,6 +426,7 @@ window.addEventListener("load", () => {
     }
   }
 })
+
 document.addEventListener('DOMContentLoaded', function() {
   const hoverDelay = 500;
   const offsetX = 10;
@@ -471,6 +504,7 @@ document.addEventListener('DOMContentLoaded', function() {
       shownOnce = false;
     });
   });
+
 const labels = document.querySelectorAll('label');
 const contextMenu = document.getElementById('contextFilterMenu');
 let currentLabel = null;
