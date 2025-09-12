@@ -16,9 +16,15 @@ import subprocess
 def run_file_dialog():
     root = tk.Tk()
     root.withdraw()
-    file_path = filedialog.askopenfilename(filetypes=[("SDFZ files", "*.sdfz")])
+    file_path = filedialog.askopenfilename(filetypes=[("SDFZ files", "*.sdfz"), ("All files", "*.*")])
+    if file_path:
+        root.destroy()
+        return file_path
+    dir_path = filedialog.askdirectory()
     root.destroy()
-    return file_path
+    if dir_path:
+        return dir_path
+    return None
 
 parser = argparse.ArgumentParser(
   prog="BARreplays",
