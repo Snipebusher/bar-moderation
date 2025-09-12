@@ -22,6 +22,7 @@ from .pages import buildPage, THEME
 
 REPLAY_PAGE = "https://www.beyondallreason.info/replays?gameId=%s"
 MATCH_PAGE = "https://server4.beyondallreason.info/battle/%s"
+GEX_PAGE    = "https://gex.honu.pw/match/%s"
 
 class Player(NamedTuple):
   index: int
@@ -231,13 +232,14 @@ def buildReplayPage(filename: str):
     dt = summary.header.unixTime.isoformat(" ")
     date_part, time_part = dt.split(" ")
     return """
-    <h1>%s - %s - %s - <a href="%s">Replay</a> / <a href="%s">Match</a></h1>
+    <h1>%s - %s - %s - <a href="%s">Replay</a> / <a href="%s">Match</a> / <a href="%s">Gex</a></h1>
     """ % (
     date_part,
     time_part,
     html.escape(str(summary.game["mapname"])),
     REPLAY_PAGE % (summary.header.gameID),
     MATCH_PAGE % (summary.game["server_match_id"]) if summary.game.get("server_match_id") else "",
+    GEX_PAGE % (summary.header.gameID),
 )
 
   def htmlHeaders():
