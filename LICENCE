@@ -2,20 +2,30 @@ CUSTOM LICENSE — RESTRICTED USE
 
 Copyright © 2025 Snipebusher and Contributors
 
-This project, called "Python Moderation Tool", is based in part on code originally created by aurelienlt, who stated in their README that the code may be freely used and modified. That original code remains available under those permissive terms.
+This Software, called "Python Moderation Tool," includes original code by aurelienlt, who released their code under a permissive license. That original code remains available under those terms.
 
-Additional contributions to the Project have been made by:
+Additional contributions to the Software have been made by:
+
 - fritman1
 
 All rights to modifications, additions, and original content created by Snipebusher and the listed contributors are reserved. Except as expressly provided below, no part of these contributions may be copied, modified, distributed, sublicensed, or used for any purpose without the prior written permission of the copyright holders.
 
 AUTHORIZED USE
-Members of the Beyond All Reason Moderation Team are granted a perpetual, non-exclusive, royalty-free license to use, execute, and modify the Project solely for the purpose of performing moderation and administrative duties within the Beyond All Reason project.
+Members of the Beyond All Reason Moderation Team, as officially recognized by the Beyond All Reason project leadership, are granted a non-exclusive, royalty-free, revocable license to use and internally modify this Software solely for the purpose of performing moderation and administrative duties within the Beyond All Reason project.
+
+This license is granted as a matter of permission, not right, and may be revoked in whole or in part at any time and for any reason by the copyright holders.
 
 RESTRICTIONS
-- This license does not grant permission to share, publish, redistribute, or sublicense the Project outside of the Beyond All Reason Moderation Team.
-- Any use of the Project outside the scope of moderation and administrative duties is strictly prohibited.
-- No derivative works, forks, or modified versions may be distributed without explicit prior permission from the copyright holders.
+
+- This license does not grant permission to share, publish, redistribute, or sublicense this Software or derivative works outside of the Beyond All Reason Moderation Team.
+- Internal modifications for moderation purposes are permitted, but any external distribution of modified or derivative versions requires prior written permission from the copyright holders.
+- Any use of this Software outside the scope of moderation and administrative duties is strictly prohibited.
 
 TERMINATION
-Any violation of these terms immediately and automatically terminates the rights granted herein.
+
+- Any violation of these terms immediately and automatically terminates the rights granted herein.
+- In addition, the copyright holders may revoke or terminate this license at any time, with or without cause, by providing written or electronic notice to the Beyond All Reason Moderation Team or its leadership.
+- Upon termination or revocation, all use of this Software must cease immediately, and any copies or modifications in possession of the Beyond All Reason Moderation Team must be destroyed or returned.
+
+DISCLAIMER
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THIS SOFTWARE OR THE USE OR OTHER DEALINGS IN THIS SOFTWARE.
