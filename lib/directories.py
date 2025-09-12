@@ -23,7 +23,8 @@ def buildDirectoryPage(dir: str):
   dirobj = pathlib.Path(dir)
 
   subdirs = [subdir for subdir in dirobj.iterdir() if subdir.is_dir()]
-  replayFiles = [file for file in dirobj.iterdir() if file.is_file() and file.suffix == ".sdfz"]
+  replayFiles = sorted(
+      (file for file in dirobj.iterdir() if file.is_file() and file.suffix == ".sdfz"), key=lambda p: p.stat().st_ctime, reverse=True)
 
   def builSubDirs():
     if not subdirs: return ""

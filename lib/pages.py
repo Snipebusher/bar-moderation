@@ -100,13 +100,12 @@ def buildPage(filename: str, content: str, *, style="", script=""):
             </a>
           </div>
           <div style="flex:1;text-align:right;">
-            v1.3.1
+            v1.3.2
           </div>
         </div>
       </div>
     </div>
     <div class="context-menu" id="contextFilterMenu">
-    <!-- Menu options will be inserted here dynamically -->
     </div>
   </body>
 </html>
@@ -510,9 +509,8 @@ const contextMenu = document.getElementById('contextFilterMenu');
 let currentLabel = null;
 labels.forEach(label => {
     label.addEventListener('contextmenu', function(e) {
-    //we reject if no player- in class name
     if (!Array.from(label.classList).some(className => className.startsWith('player-'))) {
-      return; // Skip showing the context menu for this label
+      return;
     }
     e.preventDefault();
     currentLabel = label;
