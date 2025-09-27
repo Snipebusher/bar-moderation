@@ -73,17 +73,30 @@ def buildPage(filename: str, content: str, *, style="", script=""):
     </div>
     <div id="settingsModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:1500;">
       <div style="background-color:var(--background-color);color:var(--text-color);width:95%;max-width:1200px;max-height:95%;overflow-y:auto;padding:20px;border-radius:8px;position:relative;">
-        <button id="settingsClose" aria-label="Close settings" style="position:absolute;top:12px;right:12px;background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-color);">Close</button>
-        <h2 style="margin-top:0;">Settings</h2>
-        <div style="margin-top:10px;">
-          <label for="themeSelector" style="display:block;margin-bottom:5px;">Theme:</label>
-          <select id="themeSelector" style="width:100px;padding:8px;background-color:var(--background-color);color:var(--text-color);border:1px solid var(--text-color);border-radius:4px;">
-            <option value="system">Device</option>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-          </select>
-        </div>
-        <hr style="margin:20px 0;border-color:var(--text-color);" />
+        <h2 style="margin-top:0;text-align:center;font-size:30px;">Settings</h2>
+          <div class="setting-group">
+            <label for="themeSelector">Theme:</label>
+            <select id="themeSelector" style="width:100px;padding:8px;background-color:var(--background-color);color:var(--text-color);border:1px solid var(--text-color);border-radius:4px;">
+              <option value="system">Device</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label for="backgroundEffect">Settings Background:</label>
+            <select id="backgroundEffect" style="width:160px;padding:8px;background-color:var(--background-color);color:var(--text-color);border:1px solid var(--text-color);border-radius:4px;">
+              <option value="none">None</option>
+              <option value="darken">Darken</option>
+              <option value="blur">Blur</option>
+              <option value="both">Both</option>
+            </select>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:5px;margin-top:16px;">
+            <button id="settingsDefault" style="padding:8px 12px;border-radius:6px;background-color:#ff4500;">Defaults</button>
+            <button id="settingsCancel" style="padding:8px 12px;border-radius:6px;background-color:transparent;border-width: 1px;border-color:var(--text-color);border-style: solid;color: var(--text-color);">Cancel</button>
+            <button id="settingsSave" style="padding:8px 12px;border-radius:6px;">Save</button>
+          </div>
+        <hr style="margin:10px 0;border-color:var(--text-color);" />
         <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.9rem;flex-wrap:nowrap;">
           <div style="flex:1;text-align:left;">
             Developed by
@@ -278,6 +291,13 @@ input[type="checkbox"], input[type="radio"] {
 [data-theme="light"] input[type="checkbox"], [data-theme="light"] input[type="radio"] {
   filter: invert(0);
 }
+
+.setting-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0;
+}
 """
 SCRIPT = """
 function openSelectPath() {
@@ -397,6 +417,238 @@ function updateContextMenu(playerId, playerName) {
       contextMenu.appendChild(menuItem);
   });
 }
+
+(function () {
+  function createConfirmUI() {
+    let overlay, box, textEl, yesBtn, noBtn;
+    function ensure() {
+      if (overlay) return;
+      overlay = document.createElement('div');
+      overlay.id = '__customConfirmOverlay';
+      Object.assign(overlay.style, {
+        position: 'fixed', left: 0, top: 0, width: '100vw', height: '100vh',
+        display: 'none', alignItems: 'center', justifyContent: 'center',
+        zIndex: 99999, background: 'rgba(0,0,0,0.35)'
+      });
+
+      box = document.createElement('div');
+      Object.assign(box.style, {
+        background: 'var(--background-color, #fff)', color: 'var(--text-color,#000)',
+        padding: '18px', borderRadius: '8px', minWidth: '320px', maxWidth: '90%',
+        boxShadow: '0 6px 18px rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', gap: '12px',
+        fontFamily: 'Arial, sans-serif'
+      });
+
+      textEl = document.createElement('div');
+      textEl.style.fontSize = '15px';
+
+      const actions = document.createElement('div');
+      actions.style.display = 'flex';
+      actions.style.justifyContent = 'flex-end';
+      actions.style.gap = '8px';
+
+      noBtn = document.createElement('button');
+      noBtn.textContent = 'No';
+      noBtn.style.padding = '8px 12px';
+      noBtn.style.background = '#c81414';
+      noBtn.style.border = 'none';
+      noBtn.style.color = 'var(--text-color)';
+      noBtn.style.borderRadius = '4px';
+
+      yesBtn = document.createElement('button');
+      yesBtn.textContent = 'Yes';
+      yesBtn.style.padding = '8px 12px';
+      yesBtn.style.background = '#28a745';
+      yesBtn.style.border = 'none';
+      yesBtn.style.color = 'var(--text-color)';
+      yesBtn.style.borderRadius = '4px';
+
+      actions.appendChild(noBtn);
+      actions.appendChild(yesBtn);
+      box.appendChild(textEl);
+      box.appendChild(actions);
+      overlay.appendChild(box);
+      document.body.appendChild(overlay);
+    }
+
+    function showConfirm(message) {
+      ensure();
+      return new Promise((resolve) => {
+        overlay.style.display = 'flex';
+        textEl.textContent = message;
+        setTimeout(() => { try { yesBtn.focus(); } catch (e) {} }, 10);
+
+        const cleanup = (val) => {
+          yesBtn.removeEventListener('click', onYes);
+          noBtn.removeEventListener('click', onNo);
+          window.removeEventListener('keydown', onKey);
+          overlay.removeEventListener('click', onOverlayClick);
+          overlay.style.display = 'none';
+          resolve(!!val);
+        };
+        const onYes = () => cleanup(true);
+        const onNo = () => cleanup(false);
+        const onKey = (e) => { if (e.key === 'Escape') cleanup(false); };
+        const onOverlayClick = (e) => { if (e.target === overlay) cleanup(false); };
+
+        yesBtn.addEventListener('click', onYes);
+        noBtn.addEventListener('click', onNo);
+        window.addEventListener('keydown', onKey);
+        overlay.addEventListener('click', onOverlayClick);
+      });
+    }
+
+    return showConfirm;
+  }
+
+  const showConfirm = createConfirmUI();
+
+  function getThemeControlValue() {
+    const sel = document.getElementById('themeSelector');
+    if (sel && typeof sel.value === 'string') return sel.value;
+    const checkedRadio = document.querySelector('input[name="theme"]:checked');
+    if (checkedRadio && checkedRadio.value) return checkedRadio.value;
+    const toggle = document.querySelector('[data-theme-toggle]');
+    if (toggle) {
+      return toggle.dataset.value || toggle.dataset.theme || toggle.getAttribute('data-theme') || null;
+    }
+    const docTheme = document.documentElement.getAttribute('data-theme');
+    if (docTheme) return docTheme;
+    const stored = localStorage.getItem('theme');
+    if (stored) return stored;
+    return 'system';
+  }
+
+  function setThemeControlValue(theme) {
+    if (!theme) theme = 'system';
+    const sel = document.getElementById('themeSelector');
+    if (sel) {
+      sel.value = theme;
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    const radios = document.querySelectorAll('input[name="theme"]');
+    if (radios && radios.length) {
+      radios.forEach(r => { r.checked = (r.value === theme); });
+      const checked = document.querySelector('input[name="theme"]:checked');
+      if (checked) checked.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    const toggles = document.querySelectorAll('[data-theme-toggle]');
+    toggles.forEach(el => {
+      el.dataset.theme = theme;
+      el.dataset.value = theme;
+      try { el.setAttribute('aria-pressed', (theme === 'dark') ? 'true' : 'false'); } catch(e){}
+      el.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const btnOpen = document.getElementById('settingsButton');
+    const modal   = document.getElementById('settingsModal');
+    const btnSave = document.getElementById('settingsSave');
+    const btnCancel = document.getElementById('settingsCancel');
+    const btnDefaults = document.getElementById('settingsDefault');
+
+    let modalOpen = false;
+
+    function setOriginalSnapshot() {
+      const docTheme = document.documentElement.getAttribute('data-theme');
+      const stored = localStorage.getItem('theme');
+      const control = getThemeControlValue();
+      window.__originalSettingsTheme = stored || docTheme || control || 'system';
+    }
+
+    function openSettings() {
+      if (!modal) return;
+      setOriginalSnapshot();
+      setThemeControlValue(localStorage.getItem('theme') || window.__originalSettingsTheme || 'system');
+      modal.style.display = 'flex';
+      document.body.classList.add('modal-open');
+      modalOpen = true;
+    }
+
+    function revertToOriginal() {
+      const orig = window.__originalSettingsTheme || (localStorage.getItem('theme') || 'system');
+      setThemeControlValue(orig);
+      if (typeof applyTheme === 'function') applyTheme(orig);
+    }
+
+    function closeSettings() {
+      if (!modal) return;
+      modal.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      modalOpen = false;
+    }
+
+    function hasUnsavedChanges() {
+      const orig = window.__originalSettingsTheme || (localStorage.getItem('theme') || 'system');
+      const current = getThemeControlValue();
+      return !!(current && current !== orig);
+    }
+
+    if (btnOpen) btnOpen.addEventListener('click', openSettings);
+
+    if (btnSave) {
+      btnSave.addEventListener('click', () => {
+        const chosen = getThemeControlValue() || 'system';
+        localStorage.setItem('theme', chosen);
+        window.__originalSettingsTheme = chosen;
+        if (typeof applyTheme === 'function') applyTheme(chosen);
+        setThemeControlValue(chosen);
+        closeSettings();
+      });
+    }
+
+    if (btnDefaults) {
+      btnDefaults.addEventListener('click', async () => {
+        const ok = await showConfirm('Are you sure you want to reset all your settings to defaults?');
+        if (!ok) return;
+        const def = 'system';
+        localStorage.setItem('theme', def);
+        window.__originalSettingsTheme = def;
+        setThemeControlValue(def);
+        if (typeof applyTheme === 'function') applyTheme(def);
+      });
+    }
+
+    if (btnCancel) {
+      btnCancel.addEventListener('click', async () => {
+        if (hasUnsavedChanges()) {
+          const discard = await showConfirm('You have unsaved changes. Discard them?');
+          if (!discard) return; // keep modal open
+          revertToOriginal();   // revert controls & visual theme
+        }
+        closeSettings();
+      });
+    }
+
+    if (modal) {
+      modal.addEventListener('click', async (e) => {
+        if (e.target !== modal) return;
+        if (hasUnsavedChanges()) {
+          const discard = await showConfirm('You have unsaved changes. Discard them?');
+          if (!discard) return;
+          revertToOriginal();
+        }
+        closeSettings();
+      });
+    }
+
+    document.addEventListener('keydown', async (e) => {
+      if (e.key !== 'Escape') return;
+      if (!modalOpen) return;
+      if (hasUnsavedChanges()) {
+        const discard = await showConfirm('You have unsaved changes. Discard them?');
+        if (!discard) return;
+        revertToOriginal();
+      }
+      closeSettings();
+    });
+
+    setThemeControlValue(localStorage.getItem('theme') || window.__originalSettingsTheme || 'system');
+  });
+})();
 
 function updateFilterCheckboxes(container, updatedCheckbox) {
   if (!isFilterCheckbox(updatedCheckbox)) return
@@ -614,16 +866,25 @@ const settingBackgroundEffect = `
   </div>
 `;
 
-const basicContainer = document.getElementById("settingsBasic");
-const advancedContainer = document.getElementById("settingsAdvanced");
+const settingsContainer = (function () {
+  let el = document.getElementById("settingsContainer");
+  if (el) return el;
 
+  const modal = document.getElementById("settingsModal");
+  if (!modal) return null;
 
-// Order Setup
-if (basicContainer && advancedContainer) {
-  basicContainer.innerHTML = settingTheme;
-  advancedContainer.innerHTML = settingTheme + settingBackgroundEffect;
+  let modalInner = modal.querySelector("div");
+  if (!modalInner) modalInner = modal;
+
+  el = document.createElement("div");
+  el.id = "settingsContainer";
+  modalInner.insertBefore(el, modalInner.firstChild);
+  return el;
+})();
+
+if (settingsContainer) {
+  settingsContainer.innerHTML = settingTheme + settingBackgroundEffect;
 }
-
 
 let originalValues = {
   theme: localStorage.getItem("theme") || "system",
@@ -641,28 +902,6 @@ function valuesChanged() {
   const current = getCurrentValues();
   return current.theme !== originalValues.theme || current.backgroundEffect !== originalValues.backgroundEffect;
 }
-
-function activateTab(tab) {
-  const basic = document.getElementById("settingsBasic");
-  const advanced = document.getElementById("settingsAdvanced");
-  const btnBasic = document.getElementById("tabBasic");
-  const btnAdvanced = document.getElementById("tabAdvanced");
-
-  if (tab === "basic") {
-    btnBasic.classList.add("active");
-    btnAdvanced.classList.remove("active");
-    basic.style.display = "block";
-    advanced.style.display = "none";
-  } else {
-    btnBasic.classList.remove("active");
-    btnAdvanced.classList.add("active");
-    basic.style.display = "none";
-    advanced.style.display = "block";
-  }
-}
-
-document.getElementById("tabBasic").addEventListener("click", () => activateTab("basic"));
-document.getElementById("tabAdvanced").addEventListener("click", () => activateTab("advanced"));
 
 let previewActive = false;
 const previewBtn = document.getElementById("settingsPreview");
@@ -751,35 +990,4 @@ document.getElementById("settingsCancel").addEventListener("click", promptCancel
 modal.addEventListener("click", (e) => {
   if (e.target === modal) promptCancel();
 });
-
-document.addEventListener("DOMContentLoaded", function () {
-  const themeSelector = document.getElementById("themeSelector");
-  const bgSelector = document.getElementById("backgroundEffect");
-
-  if (themeSelector) {
-    themeSelector.value = originalValues.theme;
-    themeSelector.addEventListener("change", () => {
-      applyTheme(themeSelector.value);
-    });
-  }
-
-  if (bgSelector) {
-    bgSelector.value = originalValues.backgroundEffect;
-    bgSelector.addEventListener("change", () => {
-      applyModalBackground();
-    });
-  }
-
-  applyTheme(originalValues.theme);
-  applyModalBackground();
-});
-
-function applyTheme(theme) {
-  if (theme === "system") {
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    document.documentElement.setAttribute("data-theme", prefersDark ? "dark" : "light");
-  } else {
-    document.documentElement.setAttribute("data-theme", theme);
-  }
-}
 """
