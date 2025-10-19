@@ -271,10 +271,19 @@ def buildReplayPage(filename: str):
     else:
       return ""
 
+  def pingGrowth(x, max_value=1000, max_size= 300):
+      base_size = 100
+      res= max_size
+      if  x < max_value:
+        res = base_size +  (x**(math.log(max_size-base_size,max_value))) #fancy ! => add to the base size of a char the result of mapping [0; max_value] to [0, max_size(-base)] (with log)
+      return res
+
   def htmlLogLines():
-    pingMaxSize = 500
+    pingMaxSize = 300
+    pingScaling = 5
     tableLines: list[str] = []
     lastFrom = None
+
     for gameTime, playerFrom, playerTo, lineType, msgStr in summary.logLines:
       seconds = gameTime - summary.startTime
       format = "%02d:%02d:%05.2f"
@@ -293,7 +302,9 @@ def buildReplayPage(filename: str):
 
       if isinstance(msgStr, tuple):
         if msgStr[0] == "PING": #useless check
-          msgStr = """<span style="font-size: %d%%">%d times</span>""" % (min(pingMaxSize,(100 + 5 * (len(msgStr[1]) - 1))), len(msgStr[1]))
+          numberOfPing = len(msgStr[1])
+          localsize = pingGrowth(numberOfPing-1)
+          msgStr = """<span style="font-size: %d%%">%d times</span>""" % (localsize, numberOfPing)
         elif msgStr[0] == "DRAW":
           _, minx, minz, maxx, maxz = msgStr[1][0]
           svgLines = []
