@@ -35,7 +35,6 @@ class Player(NamedTuple):
   allyteam: int = None
   side: str = None
   rgbcolor: tuple[float, float, float] = None
-  pingMaxSize : int = 500
 
 LogLine = Union[
   tuple[float, int, int, Literal["JOINED"]],
@@ -212,6 +211,7 @@ def buildReplayPage(filename: str):
   replay = readReplay(filename, chunks=True)
   summary = processReplay(replay)
 
+
   def cssRgb(color):
     return "rgb(%f%%, %f%%, %f%%)" % tuple(100 * v for v in color)
 
@@ -272,6 +272,7 @@ def buildReplayPage(filename: str):
       return ""
 
   def htmlLogLines():
+    pingMaxSize = 500
     tableLines: list[str] = []
     lastFrom = None
     for gameTime, playerFrom, playerTo, lineType, msgStr in summary.logLines:
