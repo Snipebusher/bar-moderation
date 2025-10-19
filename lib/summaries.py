@@ -35,6 +35,7 @@ class Player(NamedTuple):
   allyteam: int = None
   side: str = None
   rgbcolor: tuple[float, float, float] = None
+  pingMaxSize : int = 500
 
 LogLine = Union[
   tuple[float, int, int, Literal["JOINED"]],
@@ -291,7 +292,7 @@ def buildReplayPage(filename: str):
 
       if isinstance(msgStr, tuple):
         if msgStr[0] == "PING": #useless check
-          msgStr = """<span style="font-size: %d%%">%d times</span>""" % (100 + 5 * (len(msgStr[1]) - 1), len(msgStr[1]))
+          msgStr = """<span style="font-size: %d%%">%d times</span>""" % (min(pingMaxSize,(100 + 5 * (len(msgStr[1]) - 1))), len(msgStr[1]))
         elif msgStr[0] == "DRAW":
           _, minx, minz, maxx, maxz = msgStr[1][0]
           svgLines = []
