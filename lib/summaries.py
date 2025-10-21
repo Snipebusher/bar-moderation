@@ -271,16 +271,11 @@ def buildReplayPage(filename: str):
     else:
       return ""
 
-  def pingGrowth(x, max_value=1000, max_size= 300):
+  def pingGrowth(x, highest_ping_number=1000, max_size= 300, scaling_speed = 0.009):
       base_size = 100
-      res= max_size
-      if  x < max_value:
-        res = base_size +  (x**(math.log(max_size-base_size,max_value))) #fancy ! => add to the base size of a char the result of mapping [0; max_value] to [0, max_size(-base)] (with log)
-      return res
+      return max (0,base_size + ((max_size-base_size) * (1 - math.exp((-scaling_speed) * x))))
 
   def htmlLogLines():
-    pingMaxSize = 300
-    pingScaling = 5
     tableLines: list[str] = []
     lastFrom = None
 
