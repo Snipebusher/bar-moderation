@@ -142,22 +142,23 @@ def processReplay(replay: Replay):
           msgStrOld = decode(data[9:-1])
           isOldBad = any(ord(char) < 32 or ord(char) == 127 for char in msgStrOld)
           isNewBad = any(ord(char) < 32 or ord(char) == 127 for char in msgStrNew)
+          to_index = 253 if (drawFrom in players and getattr(players[drawFrom], 'spectator', 0)) else 252
           if isNewBad: #selecting old replay decoding (but most likely will result into using newer and cutting first part of message)
             msgStr = msgStrOld
           elif isOldBad or not isNewBad : #selecting new replay decoding (as of june 2025)
             msgStr = msgStrNew
           else:
             msgStr = msgStrNew
-            print("WARNING : encoding as yet again change, plesae fix") #future
+            print("WARNING : Encoding as yet again changed, please fix") #future
         cache = playerCache.pop(drawFrom, None)
         if msgStr:
-          logLines.append((gameTime, drawFrom, 252, "PING", msgStr))
+          logLines.append((gameTime, drawFrom, to_index, "PING", msgStr))
         else:
           if cache and cache[0] == "PING" and cache[1][-1] > gameTime - 2:
             cache[1].append(gameTime)
           else:
             cache = ("PING", [gameTime])
-            logLines.append((gameTime, drawFrom, 252, "PING", cache))
+            logLines.append((gameTime, drawFrom, to_index, "PING", cache))
           playerCache[drawFrom] = cache
       # map draw
       elif drawType == 2:
@@ -210,7 +211,6 @@ SPECIAL_PLAYER_INDICES = {
 def buildReplayPage(filename: str):
   replay = readReplay(filename, chunks=True)
   summary = processReplay(replay)
-
 
   def cssRgb(color):
     return "rgb(%f%%, %f%%, %f%%)" % tuple(100 * v for v in color)
@@ -271,19 +271,48 @@ def buildReplayPage(filename: str):
     else:
       return ""
 
-  def pingGrowth(x, max_value=1000, max_size= 300):
-      base_size = 100
-      res= max_size
-      if  x < max_value:
-        res = base_size +  (x**(math.log(max_size-base_size,max_value))) #fancy ! => add to the base size of a char the result of mapping [0; max_value] to [0, max_size(-base)] (with log)
-      return res
+  def pingGrowth(
+    numberOfPing: float,
+    base_size: float = 100.0,
+    early_target: float = 250.0,   # at 50 pings
+    linear_target: float = 400.0,  # at 300 pings
+    final_max: float = 500.0,      # at 1000 pings
+    early_limit: float = 25.0,
+    linear_limit: float = 300.0,
+    cap: float = 1000.0,
+    early_power: float = 2.5):
+    
+    n = max(0.0, numberOfPing)
+    if n == 0:
+        return base_size
+    # --- Stage A: Power curve 1–25 pings ---
+    if n <= early_limit:
+        t = n / early_limit
+        eased = t ** early_power
+        return base_size + (early_target - base_size) * eased
+    # --- Stage B: Linear 50–300 pings ---
+    if n <= linear_limit:
+        slope = (linear_target - early_target) / (linear_limit - early_limit)
+        return early_target + slope * (n - early_limit)
+    # --- Stage C: Cubic Hermite 300–1000 pings ---
+    if n >= cap:
+        return final_max
+    
+    t = (n - linear_limit) / (cap - linear_limit)  # 0..1
+    v0 = linear_target
+    v1 = final_max
+    slope_at_lin = (linear_target - early_target) / (linear_limit - early_limit)
+    m0 = slope_at_lin * (cap - linear_limit)
+    m1 = 0.0
+    h00 = 2*t**3 - 3*t**2 + 1
+    h10 = t**3 - 2*t**2 + t
+    h01 = -2*t**3 + 3*t**2
+    h11 = t**3 - t**2
+    return h00*v0 + h10*m0 + h01*v1 + h11*m1
 
   def htmlLogLines():
-    pingMaxSize = 300
-    pingScaling = 5
     tableLines: list[str] = []
     lastFrom = None
-
     for gameTime, playerFrom, playerTo, lineType, msgStr in summary.logLines:
       seconds = gameTime - summary.startTime
       format = "%02d:%02d:%05.2f"
@@ -451,6 +480,110 @@ def buildReplayPage(filename: str):
 </div>
 
 %s
+
+<script>
+(function(){
+  function clearAllHighlights(){
+    const rows = document.querySelectorAll('#log-table tbody tr.highlighted');
+    rows.forEach(r=> r.classList.remove('highlighted'));
+    const prefix = 'replay_highlight_' + (location.pathname || '');
+    const keysToRemove = [];
+    for(let i=0;i<localStorage.length;i++){
+      const k = localStorage.key(i);
+      if(k && k.startsWith(prefix)) keysToRemove.push(k);
+    }
+    keysToRemove.forEach(k=> localStorage.removeItem(k));
+  }
+  function isTextSelected(){
+    try{
+      if(window.getSelection){
+        const s = window.getSelection();
+        if(s && s.toString && s.toString().length > 0) return true;
+      }
+    }catch(_){ }
+    return false;
+  }
+  function initHighlights(){
+    const tbody = document.querySelector('#log-table tbody');
+    if(!tbody) return;
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    rows.forEach((tr, idx)=>{
+      tr.dataset.line = idx;
+      const key = 'replay_highlight_' + (location.pathname || '') + '_' + tr.dataset.line;
+      if(localStorage.getItem(key)) tr.classList.add('highlighted');
+      const toggle = ()=>{
+        const key = 'replay_highlight_' + (location.pathname || '') + '_' + tr.dataset.line;
+        const nowHighlighted = tr.classList.toggle('highlighted');
+        if(nowHighlighted) localStorage.setItem(key, '1');
+        else localStorage.removeItem(key);
+      };
+      tr.addEventListener('dblclick', (e)=>{
+        // If you later want to restrict dblclick to only the message cell (5th TD), uncomment the following block:
+        // const td = e.target.closest('td');
+        // if(!td) return;
+        // if(td.cellIndex !== 4) return; // only the 5th column
+        e.preventDefault(); // prevent default double-click selection behavior
+        try{ if(window.getSelection) window.getSelection().removeAllRanges(); }catch(_){ }
+        toggle();
+      });
+      tr.addEventListener('click', (e)=>{
+        if(e.detail >= 3){
+          e.preventDefault();
+          e.stopPropagation();
+          try{ if(window.getSelection) window.getSelection().removeAllRanges(); }catch(_){ }
+        }
+      });
+      let timer = null;
+      let moved = false;
+      let startX = 0, startY = 0;
+      const MOVE_THRESHOLD = 6;
+      const startPress = (e)=>{
+        if(e.type === 'mousedown' && e.button !== 0) return;
+        moved = false;
+        timer = setTimeout(()=>{
+          timer = null;
+          if(isTextSelected() || moved) return;
+          clearAllHighlights();
+        }, 600);
+        if(e.type === 'mousedown'){
+          startX = e.clientX; startY = e.clientY;
+        }else if(e.type === 'touchstart' && e.touches && e.touches[0]){
+          startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+        }
+        const onMove = (ev)=>{
+          let cx = 0, cy = 0;
+          if(ev.type === 'mousemove') { cx = ev.clientX; cy = ev.clientY; }
+          else if(ev.type === 'touchmove' && ev.touches && ev.touches[0]){ cx = ev.touches[0].clientX; cy = ev.touches[0].clientY; }
+          if(Math.abs(cx - startX) > MOVE_THRESHOLD || Math.abs(cy - startY) > MOVE_THRESHOLD) moved = true;
+          // if moved we can cancel timer early
+          if(moved && timer){ clearTimeout(timer); timer = null; }
+        };
+        document.addEventListener('mousemove', onMove, {passive: true});
+        document.addEventListener('touchmove', onMove, {passive: true});
+        const cleanup = ()=>{
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('touchmove', onMove);
+        };
+        tr._highlight_cleanup = cleanup;
+      };
+      const cancelPress = ()=>{
+        if(timer){ clearTimeout(timer); timer = null; }
+        try{ if(tr._highlight_cleanup) { tr._highlight_cleanup(); tr._highlight_cleanup = null; } }catch(_){ }
+      };
+      tr.addEventListener('mousedown', startPress);
+      tr.addEventListener('mouseup', (e)=>{ cancelPress(); });
+      tr.addEventListener('mouseleave', cancelPress);
+      tr.addEventListener('touchstart', startPress, {passive: true});
+      tr.addEventListener('touchend', (e)=>{ cancelPress(); });
+      tr.tabIndex = 0;
+      tr.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); toggle(); } });
+    });
+  }
+  if(document.readyState === 'complete' || document.readyState === 'interactive') initHighlights();
+  else document.addEventListener('DOMContentLoaded', initHighlights);
+})();
+</script>
+
 """ % (htmlHeader(), htmlHeaders(), htmlScript(), logContent)
 
   return buildPage(filename=filename, style=style, content=content)
@@ -544,6 +677,7 @@ label {
 #log-table table {
   border-spacing: 0;
   clear: both;
+  width: 100%;
 }
 
 #log-table td {
@@ -572,15 +706,41 @@ label {
   opacity: 0.5;
 }
 
-#log-table td:nth-child(2), #log-table td:nth-child(3) {
+#log-table td:nth-child(2) {
   min-width: 80px;
+}
+
+#log-table td:nth-child(3) {
+  min-width: 80px;
+  text-align: center;
 }
 
 #log-table td:nth-child(4) {
   min-width: 55px;
+  text-align: center;
 }
 
 #log-table td:nth-child(5) {
   min-width: 500px;
+}
+
+#log-table tr {
+  transition: background 180ms ease-in-out, 
+  color 180ms ease-in-out;
+}
+
+#log-table tr svg path {
+  transition: stroke 180ms ease-in-out;
+}
+
+#log-table tr.highlighted {
+  background: #ffc400;
+  color: black;
+  transition: background 180ms ease-in-out, box-shadow 180ms ease-in-out;
+  opacity: 1;
+}
+
+#log-table tr.highlighted svg path {
+  stroke: black;
 }
 """
