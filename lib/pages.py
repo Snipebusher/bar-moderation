@@ -375,17 +375,17 @@ function updateContextMenu(playerId, playerName) {
   //let reportProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId;
   let actionProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#actions_tab";
   let detailProfileLink = "https://server4.beyondallreason.info/moderation/report/user/" + playerId + "#user_details_tab";
-  //let reportsModLink =  "https://server4.beyondallreason.info/moderation/report?target_id=" + playerId;
+  let reportsModLink =  "https://server4.beyondallreason.info/moderation/report?target_id=" + playerId + "&limit=50&state=Open&kind=Any&order=Oldest+first";
   let gexProfileLink = "https://gex.honu.pw/user/" + playerId;
   let bearProfileLink = "https://www.bar-stats.pro/playerstats?playerName=" + playerName;
   //add menu option based on RealPLayerId recorded into the data field
   let menuOptions = [];
   menuOptions = [
         { text: 'Profile', action: function() { window.open(profileLink); } },
-        //{ text: 'Reports', action: function() { window.open(reportProfileLink);}},
+        //{ text: 'Reports Tab', action: function() { window.open(reportProfileLink);}},
         { text: 'Actions', action: function() { window.open(actionProfileLink); } },
         { text: 'Details', action: function() { window.open(detailProfileLink); } },
-        //{ text: 'Mod Reports', action: function() { window.open(reportsModLink); } },
+        { text: 'Reports', action: function() { window.open(reportsModLink); } },
         { text: 'Gex', action: function() { window.open(gexProfileLink); } },
         { text: 'BarStats', action: function() { window.open(bearProfileLink); } }
     ];
