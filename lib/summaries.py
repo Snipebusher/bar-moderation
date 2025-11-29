@@ -174,6 +174,12 @@ def processReplay(replay: Replay):
           z1: int = struct.unpack("<h", data[8:10])[0]
           x2: int = struct.unpack("<h", data[12:14])[0]
           z2: int = struct.unpack("<h", data[16:18])[0]
+        #Threshold to clean up small/accidental drawings
+        SMALL_DRAW_THRESHOLD = 24
+        cache_peek = playerCache.get(drawFrom)
+        if abs(x2 - x1) < SMALL_DRAW_THRESHOLD and abs(z2 - z1) < SMALL_DRAW_THRESHOLD:
+          if not (cache_peek and cache_peek[0] == "DRAW" and cache_peek[1][-1][0] > gameTime - 5):
+            continue
         cache = playerCache.pop(drawFrom, None)
         if cache and cache[0] == "DRAW" and cache[1][-1][0] > gameTime - 5:
           cache[1].append((gameTime, x1, z1, x2, z2)) #if there is a draw previously (within 5 TS), we add to cache
