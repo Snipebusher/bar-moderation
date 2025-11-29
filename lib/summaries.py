@@ -129,7 +129,7 @@ def processReplay(replay: Replay):
       else:
         logLines.append((gameTime, 255, None, "PAUSE", player_name + " unpaused the game"))
     # map draw
-    if action == 31:
+    if action in (31, 32):
       drawFrom = int(data[2])
       drawType = int(data[3])
       # map ping
