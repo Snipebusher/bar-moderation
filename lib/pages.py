@@ -50,6 +50,8 @@ def buildPage(filename: str, content: str, *, style="", script=""):
     return """
 <html>
   <head>
+      <title>DEX</title>
+      <link rel="icon" type="image/png" href="https://cdn.prod.website-files.com/5c69241780da2a1dfc6caa4e/651d8583f834484b3ad7eab1_BAR_moderation_web.png">
     <style>
 {defaultStyle}
 {theme_css}
